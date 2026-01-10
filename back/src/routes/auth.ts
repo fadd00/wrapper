@@ -15,52 +15,66 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
         secret: env.JWT_SECRET,
         exp: '7d'
     }))
-    .post('/register', async ({ body, jwt }) => {
-        const { email, password } = body;
+    .post('/register', async ({ body, jwt, set }) => {
+        try {
+            const { email, password } = body;
 
-        // Check if user already exists
-        const existingUser = await prisma.user.findUnique({
-            where: { email }
-        });
+            // Check if user already exists
+            const existingUser = await prisma.user.findUnique({
+                where: { email }
+            });
 
-        if (existingUser) {
-            throw new Error('User already exists');
-        }
-
-        // Hash password
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        // Create user
-        const user = await prisma.user.create({
-            data: {
-                email,
-                password: hashedPassword
-            },
-            select: {
-                id: true,
-                email: true,
-                createdAt: true
+            if (existingUser) {
+                set.status = 400;
+                return {
+                    success: false,
+                    error: 'Registration failed',
+                    message: 'User already exists'
+                };
             }
-        });
 
-        // Generate JWT token
-        const token = await jwt.sign({
-            userId: user.id,
-            email: user.email
-        });
+            // Hash password
+            const hashedPassword = await bcrypt.hash(password, 10);
 
-        return {
-            success: true,
-            message: 'User registered successfully',
-            data: {
-                user: {
-                    id: user.id,
-                    email: user.email,
-                    createdAt: user.createdAt
+            // Create user
+            const user = await prisma.user.create({
+                data: {
+                    email,
+                    password: hashedPassword
                 },
-                token
-            }
-        };
+                select: {
+                    id: true,
+                    email: true,
+                    createdAt: true
+                }
+            });
+
+            // Generate JWT token
+            const token = await jwt.sign({
+                userId: user.id,
+                email: user.email
+            });
+
+            return {
+                success: true,
+                message: 'User registered successfully',
+                data: {
+                    user: {
+                        id: user.id,
+                        email: user.email,
+                        createdAt: user.createdAt
+                    },
+                    token
+                }
+            };
+        } catch (error: any) {
+            set.status = 500;
+            return {
+                success: false,
+                error: 'Registration failed',
+                message: error.message || 'An error occurred'
+            };
+        }
     }, {
         body: t.Object({
             email: t.String({ format: 'email' }),
@@ -68,43 +82,62 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
         })
     })
 
-    .post('/login', async ({ body, jwt }) => {
-        const { email, password } = body;
+    .post('/login', async ({ body, jwt, set }) => {
+        try {
+            const { email, password } = body;
 
-        // Find user
-        const user = await prisma.user.findUnique({
-            where: { email }
-        });
+            // Find user
+            const user = await prisma.user.findUnique({
+                where: { email }
+            });
 
-        if (!user) {
-            throw new Error('Invalid email or password');
-        }
-
-        // Verify password
-        const isValidPassword = await bcrypt.compare(password, user.password);
-
-        if (!isValidPassword) {
-            throw new Error('Invalid email or password');
-        }
-
-        // Generate JWT token
-        const token = await jwt.sign({
-            userId: user.id,
-            email: user.email
-        });
-
-        return {
-            success: true,
-            message: 'Login successful',
-            data: {
-                user: {
-                    id: user.id,
-                    email: user.email,
-                    createdAt: user.createdAt
-                },
-                token
+            if (!user) {
+                set.status = 401;
+                return {
+                    success: false,
+                    error: 'Login failed',
+                    message: 'Invalid email or password'
+                };
             }
-        };
+
+            // Verify password
+            const isValidPassword = await bcrypt.compare(password, user.password);
+
+            if (!isValidPassword) {
+                set.status = 401;
+                return {
+                    success: false,
+                    error: 'Login failed',
+                    message: 'Invalid email or password'
+                };
+            }
+
+            // Generate JWT token
+            const token = await jwt.sign({
+                userId: user.id,
+                email: user.email
+            });
+
+            return {
+                success: true,
+                message: 'Login successful',
+                data: {
+                    user: {
+                        id: user.id,
+                        email: user.email,
+                        createdAt: user.createdAt
+                    },
+                    token
+                }
+            };
+        } catch (error: any) {
+            set.status = 500;
+            return {
+                success: false,
+                error: 'Login failed',
+                message: error.message || 'An error occurred'
+            };
+        }
     }, {
         body: t.Object({
             email: t.String({ format: 'email' }),
