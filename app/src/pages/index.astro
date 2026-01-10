@@ -1,0 +1,246 @@
+---
+import Layout from "../layouts/Layout.astro";
+import CodeSnippet from "../components/CodeSnippet.astro";
+
+const curlExample = `curl -X POST https://wrapper-api.com/api/send-receipt \\
+  -H "X-API-Key: wp_your_api_key_here" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "item": "Laptop",
+    "harga": "5000000",
+    "email": "customer@example.com"
+  }'`;
+
+const jsExample = `const response = await fetch('https://wrapper-api.com/api/send-receipt', {
+  method: 'POST',
+  headers: {
+    'X-API-Key': 'wp_your_api_key_here',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    item: 'Laptop',
+    harga: '5000000',
+    email: 'customer@example.com'
+  })
+});
+
+const data = await response.json();
+console.log(data);`;
+---
+
+<Layout title="Wrapper API - Email Receipt API Wrapper">
+    <div class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1 class="fade-in">
+                        Beautiful Receipt Emails,<br />
+                        <span class="gradient-text">Simplified.</span>
+                    </h1>
+                    <p class="hero-description fade-in">
+                        A simple API wrapper for Resend that lets you send
+                        professionally designed receipt emails with just one
+                        request. No template management, no complexity.
+                    </p>
+                    <div class="hero-actions fade-in">
+                        <a href="/register" class="button primary"
+                            >Get API Key</a
+                        >
+                        <a href="/docs" class="button secondary"
+                            >View Documentation</a
+                        >
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="features">
+        <div class="container">
+            <div class="features-grid">
+                <div class="feature-card card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Lightning Fast</h3>
+                    <p>
+                        Send receipt emails in milliseconds with our optimized
+                        infrastructure.
+                    </p>
+                </div>
+                <div class="feature-card card">
+                    <div class="feature-icon">🎨</div>
+                    <h3>Beautiful Design</h3>
+                    <p>
+                        Clean, modern, dark-themed email templates that look
+                        great everywhere.
+                    </p>
+                </div>
+                <div class="feature-card card">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Secure & Reliable</h3>
+                    <p>
+                        API key authentication and comprehensive request logging
+                        built-in.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="examples">
+        <div class="container">
+            <div class="examples-header">
+                <h2>Simple Integration</h2>
+                <p>
+                    Get started in seconds with your favorite language or tool
+                </p>
+            </div>
+
+            <div class="examples-grid">
+                <div>
+                    <h3>cURL</h3>
+                    <CodeSnippet language="bash" code={curlExample} />
+                </div>
+                <div>
+                    <h3>JavaScript</h3>
+                    <CodeSnippet language="javascript" code={jsExample} />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="cta">
+        <div class="container">
+            <div class="cta-content gradient-border card">
+                <h2>Ready to get started?</h2>
+                <p>
+                    Create your account and get your API key in less than a
+                    minute.
+                </p>
+                <a href="/register" class="button primary">Get Started Free</a>
+            </div>
+        </div>
+    </div>
+</Layout>
+
+<style>
+    .hero {
+        padding: var(--space-24) 0 var(--space-16);
+    }
+
+    .hero-content {
+        max-width: 800px;
+        margin: 0 auto;
+        text-align: center;
+    }
+
+    .hero-text h1 {
+        margin-bottom: var(--space-6);
+        line-height: 1.1;
+    }
+
+    .hero-description {
+        font-size: 1.25rem;
+        color: var(--color-text-secondary);
+        margin: 0 auto var(--space-8);
+        max-width: 600px;
+    }
+
+    .hero-actions {
+        display: flex;
+        gap: var(--space-4);
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .features {
+        padding: var(--space-16) 0;
+        background-color: var(--color-bg-secondary);
+    }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: var(--space-6);
+    }
+
+    .feature-card {
+        text-align: center;
+        padding: var(--space-8);
+    }
+
+    .feature-icon {
+        font-size: 3rem;
+        margin-bottom: var(--space-4);
+    }
+
+    .feature-card h3 {
+        margin-bottom: var(--space-3);
+        color: var(--color-text-primary);
+    }
+
+    .feature-card p {
+        margin: 0 auto;
+    }
+
+    .examples {
+        padding: var(--space-16) 0;
+    }
+
+    .examples-header {
+        text-align: center;
+        margin-bottom: var(--space-12);
+    }
+
+    .examples-header h2 {
+        margin-bottom: var(--space-4);
+    }
+
+    .examples-header p {
+        font-size: 1.125rem;
+        margin: 0 auto;
+    }
+
+    .examples-grid {
+        display: grid;
+        gap: var(--space-8);
+    }
+
+    .examples-grid h3 {
+        margin-bottom: var(--space-4);
+        color: var(--color-text-primary);
+    }
+
+    .cta {
+        padding: var(--space-16) 0;
+    }
+
+    .cta-content {
+        text-align: center;
+        padding: var(--space-12);
+    }
+
+    .cta-content h2 {
+        margin-bottom: var(--space-4);
+    }
+
+    .cta-content p {
+        font-size: 1.125rem;
+        margin: 0 auto var(--space-6);
+    }
+
+    @media (max-width: 768px) {
+        .hero {
+            padding: var(--space-16) 0 var(--space-12);
+        }
+
+        .hero-description {
+            font-size: 1.125rem;
+        }
+
+        .features,
+        .examples,
+        .cta {
+            padding: var(--space-12) 0;
+        }
+    }
+</style>

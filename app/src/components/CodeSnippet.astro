@@ -1,0 +1,114 @@
+---
+interface Props {
+    language?: string;
+    code: string;
+}
+
+const { language = "bash", code } = Astro.props;
+---
+
+<div class="code-snippet">
+    <div class="code-header">
+        <span class="language-tag">{language}</span>
+        <button class="copy-button" data-code={code}>
+            <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+            >
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path
+                    d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+                ></path>
+            </svg>
+            <span>Copy</span>
+        </button>
+    </div>
+    <pre><code>{code}</code></pre>
+</div>
+
+<style>
+    .code-snippet {
+        background-color: var(--color-bg-secondary);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        margin: var(--space-6) 0;
+    }
+
+    .code-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: var(--space-3) var(--space-4);
+        background-color: var(--color-bg-tertiary);
+        border-bottom: 1px solid var(--color-border);
+    }
+
+    .language-tag {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        color: var(--color-text-tertiary);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-weight: 600;
+    }
+
+    .copy-button {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        padding: var(--space-2) var(--space-3);
+        font-size: 0.8125rem;
+        color: var(--color-text-secondary);
+        background: transparent;
+        border: 1px solid var(--color-border-light);
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        transition: all var(--transition-fast);
+    }
+
+    .copy-button:hover {
+        color: var(--color-text-primary);
+        background-color: var(--color-bg-secondary);
+        border-color: var(--color-border);
+    }
+
+    .copy-button svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    pre {
+        padding: var(--space-6);
+        margin: 0;
+        overflow-x: auto;
+    }
+
+    code {
+        font-size: 0.875rem;
+        line-height: 1.6;
+        color: var(--color-text-primary);
+    }
+</style>
+
+<script>
+    document.querySelectorAll(".copy-button").forEach((button) => {
+        button.addEventListener("click", async () => {
+            const code = button.getAttribute("data-code");
+            if (code) {
+                await navigator.clipboard.writeText(code);
+                const span = button.querySelector("span");
+                if (span) {
+                    const originalText = span.textContent;
+                    span.textContent = "Copied!";
+                    setTimeout(() => {
+                        span.textContent = originalText;
+                    }, 2000);
+                }
+            }
+        });
+    });
+</script>

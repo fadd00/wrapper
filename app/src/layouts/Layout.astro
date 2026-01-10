@@ -1,0 +1,146 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = "Email Receipt API Wrapper - Send beautiful receipt emails via Resend" } = Astro.props;
+const apiUrl = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+    <link rel="stylesheet" href="/src/styles/global.css" />
+  </head>
+  <body>
+    <nav class="nav">
+      <div class="container">
+        <div class="nav-content">
+          <a href="/" class="logo">
+            <span class="gradient-text">Wrapper</span>
+          </a>
+          <div class="nav-links">
+            <a href="/docs">Docs</a>
+            <a href="/dashboard">Dashboard</a>
+            <a href="/login" class="button primary">Get Started</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-content">
+          <p>&copy; {new Date().getFullYear()} Wrapper API. Built with Elysia & Astro.</p>
+          <div class="footer-links">
+            <a href={`${apiUrl}/swagger`} target="_blank" rel="noopener noreferrer">API Docs</a>
+            <a href="https://github.com" target="_blank" rel="noopener noreferrer">GitHub</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <style>
+      .nav {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background-color: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--color-border-light);
+      }
+
+      .nav-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 4rem;
+      }
+
+      .logo {
+        font-size: 1.5rem;
+        font-weight: 700;
+        text-decoration: none;
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: var(--space-6);
+      }
+
+      .nav-links a {
+        color: var(--color-text-secondary);
+        text-decoration: none;
+        transition: color var(--transition-fast);
+        font-weight: 500;
+      }
+
+      .nav-links a:hover {
+        color: var(--color-text-primary);
+      }
+
+      main {
+        min-height: calc(100vh - 8rem);
+      }
+
+      .footer {
+        border-top: 1px solid var(--color-border-light);
+        padding: var(--space-8) 0;
+        background-color: var(--color-bg-secondary);
+      }
+
+      .footer-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: var(--space-4);
+      }
+
+      .footer-content p {
+        color: var(--color-text-tertiary);
+        font-size: 0.875rem;
+      }
+
+      .footer-links {
+        display: flex;
+        gap: var(--space-6);
+      }
+
+      .footer-links a {
+        color: var(--color-text-tertiary);
+        font-size: 0.875rem;
+        transition: color var(--transition-fast);
+      }
+
+      .footer-links a:hover {
+        color: var(--color-text-primary);
+      }
+
+      @media (max-width: 768px) {
+        .nav-links {
+          gap: var(--space-4);
+        }
+
+        .nav-links a:not(.button) {
+          display: none;
+        }
+
+        .footer-content {
+          flex-direction: column;
+          text-align: center;
+        }
+      }
+    </style>
+  </body>
+</html>

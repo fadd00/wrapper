@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now()) @map("created_at")
+  
+  apiKeys   ApiKey[]
+  
+  @@map("users")
+}
+
+model ApiKey {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  keyString String   @unique @map("key_string")
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  logs      Log[]
+  
+  @@index([userId])
+  @@map("api_keys")
+}
+
+model Log {
+  id           Int      @id @default(autoincrement())
+  apiKeyId     Int      @map("api_key_id")
+  endpoint     String
+  status       String
+  requestData  Json?    @map("request_data")
+  responseData Json?    @map("response_data")
+  timestamp    DateTime @default(now())
+  
+  apiKey       ApiKey   @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
+  
+  @@index([apiKeyId])
+  @@index([timestamp(sort: Desc)])
+  @@map("logs")
+}

@@ -1,0 +1,178 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Sign Up - Wrapper API">
+    <div class="auth-page">
+        <div class="container">
+            <div class="auth-card card gradient-border">
+                <h1>Get Started</h1>
+                <p>Create your Wrapper API account</p>
+
+                <form id="registerForm" class="auth-form">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            placeholder="you@example.com"
+                            required
+                        />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="••••••••"
+                            minlength="6"
+                            required
+                        />
+                        <small>At least 6 characters</small>
+                    </div>
+
+                    <div
+                        id="error"
+                        class="error-message"
+                        style="display: none;"
+                    >
+                    </div>
+
+                    <button type="submit" class="button primary full-width">
+                        <span id="buttonText">Create Account</span>
+                        <span
+                            id="spinner"
+                            class="spinner"
+                            style="display: none;"></span>
+                    </button>
+                </form>
+
+                <p class="auth-footer">
+                    Already have an account? <a href="/login">Sign in</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</Layout>
+
+<style>
+    .auth-page {
+        min-height: calc(100vh - 8rem);
+        display: flex;
+        align-items: center;
+        padding: var(--space-8) 0;
+    }
+
+    .auth-card {
+        max-width: 420px;
+        margin: 0 auto;
+        padding: var(--space-8);
+    }
+
+    .auth-card h1 {
+        margin-bottom: var(--space-2);
+        text-align: center;
+    }
+
+    .auth-card > p {
+        text-align: center;
+        margin-bottom: var(--space-8);
+    }
+
+    .auth-form {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-6);
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2);
+    }
+
+    .form-group label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--color-text-primary);
+    }
+
+    .form-group small {
+        font-size: 0.8125rem;
+        color: var(--color-text-tertiary);
+    }
+
+    .full-width {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .error-message {
+        padding: var(--space-3);
+        background-color: rgba(255, 71, 87, 0.1);
+        border: 1px solid var(--color-error);
+        border-radius: var(--radius-md);
+        color: var(--color-error);
+        font-size: 0.875rem;
+    }
+
+    .auth-footer {
+        text-align: center;
+        margin-top: var(--space-6);
+        font-size: 0.9375rem;
+    }
+
+    .auth-footer a {
+        font-weight: 600;
+    }
+</style>
+
+<script>
+    const apiUrl = import.meta.env.PUBLIC_API_URL || "http://localhost:3000";
+    const form = document.getElementById("registerForm") as HTMLFormElement;
+    const errorDiv = document.getElementById("error") as HTMLDivElement;
+    const buttonText = document.getElementById("buttonText") as HTMLSpanElement;
+    const spinner = document.getElementById("spinner") as HTMLSpanElement;
+
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(form);
+        const email = formData.get("email") as string;
+        const password = formData.get("password") as string;
+
+        // Show loading
+        buttonText.style.display = "none";
+        spinner.style.display = "inline-block";
+        errorDiv.style.display = "none";
+
+        try {
+            const response = await fetch(`${apiUrl}/auth/register`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || "Registration failed");
+            }
+
+            // Store token
+            localStorage.setItem("token", data.data.token);
+            localStorage.setItem("user", JSON.stringify(data.data.user));
+
+            // Redirect to dashboard
+            window.location.href = "/dashboard";
+        } catch (error: any) {
+            errorDiv.textContent = error.message;
+            errorDiv.style.display = "block";
+            buttonText.style.display = "inline";
+            spinner.style.display = "none";
+        }
+    });
+</script>
