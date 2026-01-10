@@ -28,6 +28,73 @@ import Layout from "../layouts/Layout.astro";
                     </div>
                 </div>
 
+                <!-- Send Test Receipt Section -->
+                <div class="dashboard-section card">
+                    <h2>Send Test Receipt</h2>
+                    <p
+                        style="color: var(--color-text-tertiary); margin-bottom: var(--space-4);"
+                    >
+                        Test your API by sending a receipt email
+                    </p>
+
+                    <form id="sendReceiptForm" class="receipt-form">
+                        <div class="form-group">
+                            <label for="item">Item Name</label>
+                            <input
+                                type="text"
+                                id="item"
+                                name="item"
+                                placeholder="e.g., Laptop"
+                                required
+                            />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="harga">Price (numbers only)</label>
+                            <input
+                                type="text"
+                                id="harga"
+                                name="harga"
+                                placeholder="e.g., 5000000"
+                                pattern="[0-9]+"
+                                required
+                            />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Recipient Email</label>
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                placeholder="customer@example.com"
+                                required
+                            />
+                        </div>
+
+                        <div
+                            id="receiptError"
+                            class="error-message"
+                            style="display: none;"
+                        >
+                        </div>
+                        <div
+                            id="receiptSuccess"
+                            class="success-message"
+                            style="display: none;"
+                        >
+                        </div>
+
+                        <button type="submit" class="button primary full-width">
+                            <span id="sendButtonText">Send Receipt</span>
+                            <span
+                                id="sendSpinner"
+                                class="spinner"
+                                style="display: none;"></span>
+                        </button>
+                    </form>
+                </div>
+
                 <!-- Request History Section -->
                 <div class="dashboard-section card">
                     <h2>Request History</h2>
@@ -159,6 +226,33 @@ import Layout from "../layouts/Layout.astro";
         padding: var(--space-8);
     }
 
+    .receipt-form {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-4);
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2);
+    }
+
+    .form-group label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--color-text-primary);
+    }
+
+    .success-message {
+        padding: var(--space-3);
+        background-color: rgba(0, 255, 136, 0.1);
+        border: 1px solid var(--color-success);
+        border-radius: var(--radius-md);
+        color: var(--color-success);
+        font-size: 0.875rem;
+    }
+
     @media (max-width: 768px) {
         .log-item {
             grid-template-columns: 1fr;
@@ -201,8 +295,13 @@ import Layout from "../layouts/Layout.astro";
             if (data.data.length === 0) {
                 container.innerHTML =
                     '<p class="loading">No API keys yet. Generate your first one!</p>';
+                currentApiKey = null;
                 return;
             }
+
+            // Store first active key for send receipt form
+            const activeKey = data.data.find((k: any) => k.isActive);
+            currentApiKey = activeKey ? activeKey.key : null;
 
             container.innerHTML = data.data
                 .map(
@@ -303,6 +402,73 @@ import Layout from "../layouts/Layout.astro";
                 '<p class="loading" style="color: var(--color-error);">Failed to load logs</p>';
         }
     }
+
+    // Send receipt handler
+    let currentApiKey: string | null = null;
+
+    document
+        .getElementById("sendReceiptForm")!
+        .addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const errorDiv = document.getElementById("receiptError")!;
+            const successDiv = document.getElementById("receiptSuccess")!;
+            const buttonText = document.getElementById("sendButtonText")!;
+            const spinner = document.getElementById("sendSpinner")!;
+
+            errorDiv.style.display = "none";
+            successDiv.style.display = "none";
+
+            // Get first active API key
+            if (!currentApiKey) {
+                errorDiv.textContent = "Please generate an API key first";
+                errorDiv.style.display = "block";
+                return;
+            }
+
+            const formData = new FormData(e.target as HTMLFormElement);
+            const data = {
+                item: formData.get("item") as string,
+                harga: formData.get("harga") as string,
+                email: formData.get("email") as string,
+            };
+
+            // Show loading
+            buttonText.style.display = "none";
+            spinner.style.display = "inline-block";
+
+            try {
+                const response = await fetch(`${apiUrl}/api/send-receipt`, {
+                    method: "POST",
+                    headers: {
+                        "X-API-Key": currentApiKey,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.message || "Failed to send receipt");
+                }
+
+                successDiv.textContent = `Receipt sent successfully to ${data.email}!`;
+                successDiv.style.display = "block";
+
+                // Reset form
+                (e.target as HTMLFormElement).reset();
+
+                // Reload logs to show new entry
+                setTimeout(() => loadLogs(), 1000);
+            } catch (error: any) {
+                errorDiv.textContent = error.message;
+                errorDiv.style.display = "block";
+            } finally {
+                buttonText.style.display = "inline";
+                spinner.style.display = "none";
+            }
+        });
 
     // Initial load
     loadApiKeys();
