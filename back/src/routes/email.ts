@@ -8,18 +8,65 @@ import { Resend } from 'resend';
 import { prisma } from '../config/database';
 import { env } from '../config/env';
 import { generateReceiptHTML } from '../templates/receipt';
-import { requireApiKey } from '../middleware/auth';
+import { isValidApiKeyFormat } from '../utils/apiKey';
 
 const resend = new Resend(env.RESEND_API_KEY);
 
 export const emailRoutes = new Elysia({ prefix: '/api' })
-    .use(requireApiKey)
 
-    .post('/send-receipt', async (context) => {
-        const { body, apiKeyId } = context as any;
-        const { item, harga, email } = body;
-
+    .post('/send-receipt', async ({ headers, body, set }) => {
         try {
+            // Validate API key
+            const apiKey = headers['x-api-key'];
+
+            if (!apiKey) {
+                set.status = 401;
+                return {
+                    success: false,
+                    error: 'Unauthorized',
+                    message: 'Missing X-API-Key header'
+                };
+            }
+
+            if (!isValidApiKeyFormat(apiKey)) {
+                set.status = 400;
+                return {
+                    success: false,
+                    error: 'Bad Request',
+                    message: 'Invalid API key format'
+                };
+            }
+
+            // Check if API key exists and is active
+            const keyData = await prisma.apiKey.findUnique({
+                where: { keyString: apiKey },
+                select: {
+                    id: true,
+                    userId: true,
+                    isActive: true
+                }
+            });
+
+            if (!keyData) {
+                set.status = 401;
+                return {
+                    success: false,
+                    error: 'Unauthorized',
+                    message: 'Invalid API key'
+                };
+            }
+
+            if (!keyData.isActive) {
+                set.status = 403;
+                return {
+                    success: false,
+                    error: 'Forbidden',
+                    message: 'API key has been revoked'
+                };
+            }
+
+            const { item, harga, email } = body;
+
             // Generate HTML template
             const htmlContent = generateReceiptHTML({ item, harga, email });
 
@@ -34,10 +81,10 @@ export const emailRoutes = new Elysia({ prefix: '/api' })
             // Log successful request
             await prisma.log.create({
                 data: {
-                    apiKeyId,
+                    apiKeyId: keyData.id,
                     endpoint: '/api/send-receipt',
                     status: 'success',
-                    requestData: body,
+                    requestData: body as any,
                     responseData: { emailId: result.data?.id }
                 }
             });
@@ -51,18 +98,38 @@ export const emailRoutes = new Elysia({ prefix: '/api' })
                 }
             };
         } catch (error: any) {
-            // Log failed request
-            await prisma.log.create({
-                data: {
-                    apiKeyId,
-                    endpoint: '/api/send-receipt',
-                    status: 'error',
-                    requestData: body,
-                    responseData: { error: error.message }
-                }
-            });
+            // Try to log error if we have apiKeyId
+            try {
+                const apiKey = headers['x-api-key'];
+                if (apiKey) {
+                    const keyData = await prisma.apiKey.findUnique({
+                        where: { keyString: apiKey },
+                        select: { id: true }
+                    });
 
-            throw new Error(`Failed to send email: ${error.message}`);
+                    if (keyData) {
+                        await prisma.log.create({
+                            data: {
+                                apiKeyId: keyData.id,
+                                endpoint: '/api/send-receipt',
+                                status: 'error',
+                                requestData: body as any,
+                                responseData: { error: error.message }
+                            }
+                        });
+                    }
+                }
+            } catch (logError) {
+                // Ignore log errors
+                console.error('Failed to log error:', logError);
+            }
+
+            set.status = 500;
+            return {
+                success: false,
+                error: 'Email send failed',
+                message: error.message || 'An error occurred'
+            };
         }
     }, {
         body: t.Object({
