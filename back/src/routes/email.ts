@@ -137,4 +137,86 @@ export const emailRoutes = new Elysia({ prefix: '/api' })
             harga: t.String({ pattern: '^[0-9]+$' }),
             email: t.String({ format: 'email' })
         })
+    })
+
+    // Test endpoint - auto-detect sender from API key
+    .post('/send-test-receipt', async ({ headers, body, set }) => {
+        try {
+            const apiKey = headers['x-api-key'];
+
+            if (!apiKey) {
+                set.status = 401;
+                return { success: false, error: 'Unauthorized', message: 'Missing X-API-Key header' };
+            }
+
+            if (!isValidApiKeyFormat(apiKey)) {
+                set.status = 400;
+                return { success: false, error: 'Bad Request', message: 'Invalid API key format' };
+            }
+
+            // Get API key with user info
+            const keyData = await prisma.apiKey.findUnique({
+                where: { keyString: apiKey },
+                include: { user: { select: { email: true } } }
+            });
+
+            if (!keyData) {
+                set.status = 401;
+                return { success: false, error: 'Unauthorized', message: 'Invalid API key' };
+            }
+
+            if (!keyData.isActive) {
+                set.status = 403;
+                return { success: false, error: 'Forbidden', message: 'API key has been revoked' };
+            }
+
+            const { item, harga } = body;
+            const recipientEmail = 'andhikahutama9@gmail.com';
+            const senderEmail = keyData.user.email;
+
+            // Generate HTML with sender info
+            const htmlContent = generateReceiptHTML({
+                item,
+                harga,
+                email: recipientEmail,
+                senderEmail
+            });
+
+            // Send email
+            const result = await resend.emails.send({
+                from: env.FROM_EMAIL,
+                to: recipientEmail,
+                subject: `Struk Pembelian - ${item} (dari ${senderEmail})`,
+                html: htmlContent,
+            });
+
+            // Log request
+            await prisma.log.create({
+                data: {
+                    apiKeyId: keyData.id,
+                    endpoint: '/api/send-test-receipt',
+                    status: 'success',
+                    requestData: { ...body, recipient: recipientEmail, sender: senderEmail } as any,
+                    responseData: { emailId: result.data?.id }
+                }
+            });
+
+            return {
+                success: true,
+                message: 'Test receipt sent successfully',
+                data: {
+                    emailId: result.data?.id,
+                    recipient: recipientEmail,
+                    sender: senderEmail
+                }
+            };
+        } catch (error: any) {
+            set.status = 500;
+            return { success: false, error: 'Email send failed', message: error.message };
+        }
+    }, {
+        body: t.Object({
+            item: t.String({ minLength: 1 }),
+            harga: t.String({ pattern: '^[0-9]+$' })
+        })
     });

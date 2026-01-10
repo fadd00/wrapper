@@ -26,7 +26,7 @@ const app = new Elysia()
     exp: '7d'
   }))
 
-  // Swagger documentation
+  // Swagger documentation with security schemes
   .use(swagger({
     documentation: {
       info: {
@@ -39,7 +39,23 @@ const app = new Elysia()
         { name: 'API Keys', description: 'API key management' },
         { name: 'Email', description: 'Email sending endpoints' },
         { name: 'Logs', description: 'Request logs' }
-      ]
+      ],
+      components: {
+        securitySchemes: {
+          bearerAuth: {
+            type: 'http',
+            scheme: 'bearer',
+            bearerFormat: 'JWT',
+            description: 'JWT token from /auth/login - Click "Authorize" button and paste your token'
+          },
+          apiKey: {
+            type: 'apiKey',
+            in: 'header',
+            name: 'X-API-Key',
+            description: 'API Key from dashboard (format: wp_xxxxx...)'
+          }
+        }
+      }
     }
   }))
 
@@ -93,3 +109,4 @@ const app = new Elysia()
 
 console.log(`🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`);
 console.log(`📚 API Documentation: http://${app.server?.hostname}:${app.server?.port}/swagger`);
+console.log(`🔐 Use "Authorize" button in Swagger to add Bearer token or API key`);

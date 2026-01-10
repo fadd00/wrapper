@@ -4,11 +4,14 @@ interface Props {
   description?: string;
 }
 
-const { title, description = "Email Receipt API Wrapper - Send beautiful receipt emails via Resend" } = Astro.props;
-const apiUrl = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
+const {
+  title,
+  description = "Email Receipt API Wrapper - Send beautiful receipt emails via Resend",
+} = Astro.props;
+const apiUrl = import.meta.env.PUBLIC_API_URL || "http://localhost:3000";
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -26,6 +29,7 @@ const apiUrl = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
           </a>
           <div class="nav-links">
             <a href="/docs">Docs</a>
+            <a href="/test">Test API</a>
             <a href="/dashboard">Dashboard</a>
             <a href="/login" class="button primary">Get Started</a>
           </div>
@@ -40,10 +44,20 @@ const apiUrl = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
     <footer class="footer">
       <div class="container">
         <div class="footer-content">
-          <p>&copy; {new Date().getFullYear()} Wrapper API. Built with Elysia & Astro.</p>
+          <p>
+            &copy; {new Date().getFullYear()} Wrapper API. Built with Elysia & Astro.
+          </p>
           <div class="footer-links">
-            <a href={`${apiUrl}/swagger`} target="_blank" rel="noopener noreferrer">API Docs</a>
-            <a href="https://github.com" target="_blank" rel="noopener noreferrer">GitHub</a>
+            <a
+              href={`${apiUrl}/swagger`}
+              target="_blank"
+              rel="noopener noreferrer">API Docs</a
+            >
+            <a
+              href="https://github.com"
+              target="_blank"
+              rel="noopener noreferrer">GitHub</a
+            >
           </div>
         </div>
       </div>
