@@ -5,8 +5,9 @@ API wrapper untuk kirim email receipt menggunakan Resend. Backend pakai Elysia.j
 ## Requirements
 
 - **Bun** (untuk backend dan frontend)
-- **PostgreSQL** (atau database lain yang support Prisma)
+- **Database Online** (Neon/Supabase/Railway/dll yang support PostgreSQL)
 - **Resend API Key** (daftar di [resend.com](https://resend.com))
+
 
 ## Setup
 
@@ -17,9 +18,12 @@ cd back
 # Install dependencies
 bun install
 
-# Setup env
+# Setup env (WAJIB!)
 cp .env.example .env
-# Edit .env, isi RESEND_API_KEY kamu
+# Edit .env:
+# - DATABASE_URL: connection string dari database provider kamu (Neon/Supabase/dll)
+# - RESEND_API_KEY: API key dari resend.com
+# - JWT_SECRET: secret key untuk JWT (bebas, minimal 32 karakter)
 
 # Setup database
 bunx prisma generate

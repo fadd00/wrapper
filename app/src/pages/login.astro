@@ -3,125 +3,80 @@ import Layout from "../layouts/Layout.astro";
 ---
 
 <Layout title="Login - Wrapper API">
-    <div class="auth-page">
+    <div class="min-h-[calc(100vh-8rem)] flex items-center py-8">
         <div class="container">
-            <div class="auth-card card gradient-border">
-                <h1>Welcome Back</h1>
-                <p>Sign in to your Wrapper API account</p>
+            <div
+                class="max-w-[420px] mx-auto p-8 bg-dark-bg-tertiary rounded-lg border border-dark-border-light"
+            >
+                <h1 class="text-3xl font-bold mb-2 text-center">
+                    Welcome Back
+                </h1>
+                <p class="text-center mb-8 text-text-secondary">
+                    Sign in to your Wrapper API account
+                </p>
 
-                <form id="loginForm" class="auth-form">
-                    <div class="form-group">
-                        <label for="email">Email</label>
+                <form id="loginForm" class="flex flex-col gap-6">
+                    <div class="flex flex-col gap-2">
+                        <label
+                            for="email"
+                            class="text-sm font-semibold text-text-primary"
+                            >Email</label
+                        >
                         <input
                             type="email"
                             id="email"
                             name="email"
                             placeholder="you@example.com"
                             required
+                            class="px-4 py-2.5 bg-dark-bg-secondary border border-dark-border rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-accent transition-colors"
                         />
                     </div>
 
-                    <div class="form-group">
-                        <label for="password">Password</label>
+                    <div class="flex flex-col gap-2">
+                        <label
+                            for="password"
+                            class="text-sm font-semibold text-text-primary"
+                            >Password</label
+                        >
                         <input
                             type="password"
                             id="password"
                             name="password"
                             placeholder="••••••••"
                             required
+                            class="px-4 py-2.5 bg-dark-bg-secondary border border-dark-border rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-accent transition-colors"
                         />
                     </div>
 
                     <div
                         id="error"
-                        class="error-message"
-                        style="display: none;"
+                        class="hidden p-3 bg-error/10 border border-error rounded-lg text-error text-sm"
                     >
                     </div>
 
-                    <button type="submit" class="button primary full-width">
+                    <button
+                        type="submit"
+                        class="w-full flex items-center justify-center px-6 py-3 bg-accent text-dark-bg font-semibold rounded-lg hover:bg-accent/90 transition-colors"
+                    >
                         <span id="buttonText">Sign In</span>
                         <span
                             id="spinner"
-                            class="spinner"
-                            style="display: none;"></span>
+                            class="hidden inline-block w-4 h-4 border-2 border-dark-bg border-t-transparent rounded-full animate-spin ml-2"
+                        ></span>
                     </button>
                 </form>
 
-                <p class="auth-footer">
-                    Don't have an account? <a href="/register">Sign up</a>
+                <p class="text-center mt-6 text-[15px] text-text-secondary">
+                    Don't have an account? <a
+                        href="/register"
+                        class="font-semibold text-accent hover:underline"
+                        >Sign up</a
+                    >
                 </p>
             </div>
         </div>
     </div>
 </Layout>
-
-<style>
-    .auth-page {
-        min-height: calc(100vh - 8rem);
-        display: flex;
-        align-items: center;
-        padding: var(--space-8) 0;
-    }
-
-    .auth-card {
-        max-width: 420px;
-        margin: 0 auto;
-        padding: var(--space-8);
-    }
-
-    .auth-card h1 {
-        margin-bottom: var(--space-2);
-        text-align: center;
-    }
-
-    .auth-card > p {
-        text-align: center;
-        margin-bottom: var(--space-8);
-    }
-
-    .auth-form {
-        display: flex;
-        flex-direction: column;
-        gap: var(--space-6);
-    }
-
-    .form-group {
-        display: flex;
-        flex-direction: column;
-        gap: var(--space-2);
-    }
-
-    .form-group label {
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: var(--color-text-primary);
-    }
-
-    .full-width {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .error-message {
-        padding: var(--space-3);
-        background-color: rgba(255, 71, 87, 0.1);
-        border: 1px solid var(--color-error);
-        border-radius: var(--radius-md);
-        color: var(--color-error);
-        font-size: 0.875rem;
-    }
-
-    .auth-footer {
-        text-align: center;
-        margin-top: var(--space-6);
-        font-size: 0.9375rem;
-    }
-
-    .auth-footer a {
-        font-weight: 600;
-    }
-</style>
 
 <script>
     const apiUrl = import.meta.env.PUBLIC_API_URL || "http://localhost:3000";
@@ -139,8 +94,8 @@ import Layout from "../layouts/Layout.astro";
 
         // Show loading
         buttonText.style.display = "none";
-        spinner.style.display = "inline-block";
-        errorDiv.style.display = "none";
+        spinner.classList.remove("hidden");
+        errorDiv.classList.add("hidden");
 
         try {
             const response = await fetch(`${apiUrl}/auth/login`, {
@@ -163,9 +118,9 @@ import Layout from "../layouts/Layout.astro";
             window.location.href = "/dashboard";
         } catch (error: any) {
             errorDiv.textContent = error.message;
-            errorDiv.style.display = "block";
+            errorDiv.classList.remove("hidden");
             buttonText.style.display = "inline";
-            spinner.style.display = "none";
+            spinner.classList.add("hidden");
         }
     });
 </script>

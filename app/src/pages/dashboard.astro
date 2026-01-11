@@ -3,54 +3,76 @@ import Layout from "../layouts/Layout.astro";
 ---
 
 <Layout title="Dashboard - Wrapper API">
-    <div class="dashboard">
+    <div class="py-12 min-h-[calc(100vh-8rem)]">
         <div class="container">
-            <div class="dashboard-header">
+            <div class="flex items-start justify-between mb-8 flex-wrap gap-4">
                 <div>
-                    <h1>Dashboard</h1>
-                    <p id="userEmail">Loading...</p>
+                    <h1 class="text-4xl font-bold mb-2">Dashboard</h1>
+                    <p id="userEmail" class="text-text-tertiary">Loading...</p>
                 </div>
-                <button id="logoutBtn" class="button secondary">Logout</button>
+                <button
+                    id="logoutBtn"
+                    class="px-6 py-2.5 bg-dark-bg-tertiary border border-dark-border-light text-text-primary font-semibold rounded-lg hover:border-accent transition-colors"
+                    >Logout</button
+                >
             </div>
 
-            <div class="dashboard-grid">
+            <div class="grid gap-8">
                 <!-- API Keys Section -->
-                <div class="dashboard-section card">
-                    <div class="section-header">
-                        <h2>API Keys</h2>
-                        <button id="generateKeyBtn" class="button primary">
+                <div
+                    class="p-6 bg-dark-bg-tertiary rounded-lg border border-dark-border-light"
+                >
+                    <div
+                        class="flex items-center justify-between mb-6 flex-wrap gap-4"
+                    >
+                        <h2 class="text-2xl font-bold m-0">API Keys</h2>
+                        <button
+                            id="generateKeyBtn"
+                            class="px-6 py-2.5 bg-accent text-dark-bg font-semibold rounded-lg hover:bg-accent/90 transition-colors"
+                        >
                             <span>+ Generate New Key</span>
                         </button>
                     </div>
 
-                    <div id="apiKeysList" class="api-keys-list">
-                        <p class="loading">Loading your API keys...</p>
+                    <div id="apiKeysList" class="flex flex-col gap-4">
+                        <p class="text-center text-text-tertiary py-8">
+                            Loading your API keys...
+                        </p>
                     </div>
                 </div>
 
                 <!-- Send Test Receipt Section -->
-                <div class="dashboard-section card">
-                    <h2>Send Test Receipt</h2>
-                    <p
-                        style="color: var(--color-text-tertiary); margin-bottom: var(--space-4);"
-                    >
+                <div
+                    class="p-6 bg-dark-bg-tertiary rounded-lg border border-dark-border-light"
+                >
+                    <h2 class="text-2xl font-bold mb-2">Send Test Receipt</h2>
+                    <p class="text-text-tertiary mb-4">
                         Test your API by sending a receipt email
                     </p>
 
-                    <form id="sendReceiptForm" class="receipt-form">
-                        <div class="form-group">
-                            <label for="item">Item Name</label>
+                    <form id="sendReceiptForm" class="flex flex-col gap-4">
+                        <div class="flex flex-col gap-2">
+                            <label
+                                for="item"
+                                class="text-sm font-semibold text-text-primary"
+                                >Item Name</label
+                            >
                             <input
                                 type="text"
                                 id="item"
                                 name="item"
                                 placeholder="e.g., Laptop"
                                 required
+                                class="px-4 py-2.5 bg-dark-bg-secondary border border-dark-border rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-accent transition-colors"
                             />
                         </div>
 
-                        <div class="form-group">
-                            <label for="harga">Price (numbers only)</label>
+                        <div class="flex flex-col gap-2">
+                            <label
+                                for="harga"
+                                class="text-sm font-semibold text-text-primary"
+                                >Price (numbers only)</label
+                            >
                             <input
                                 type="text"
                                 id="harga"
@@ -58,208 +80,65 @@ import Layout from "../layouts/Layout.astro";
                                 placeholder="e.g., 5000000"
                                 pattern="[0-9]+"
                                 required
+                                class="px-4 py-2.5 bg-dark-bg-secondary border border-dark-border rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-accent transition-colors"
                             />
                         </div>
 
-                        <div class="form-group">
-                            <label for="email">Recipient Email</label>
+                        <div class="flex flex-col gap-2">
+                            <label
+                                for="email"
+                                class="text-sm font-semibold text-text-primary"
+                                >Recipient Email</label
+                            >
                             <input
                                 type="email"
                                 id="email"
                                 name="email"
                                 placeholder="customer@example.com"
                                 required
+                                class="px-4 py-2.5 bg-dark-bg-secondary border border-dark-border rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-accent transition-colors"
                             />
                         </div>
 
                         <div
                             id="receiptError"
-                            class="error-message"
-                            style="display: none;"
+                            class="hidden p-3 bg-error/10 border border-error rounded-lg text-error text-sm"
                         >
                         </div>
                         <div
                             id="receiptSuccess"
-                            class="success-message"
-                            style="display: none;"
+                            class="hidden p-3 bg-success/10 border border-success rounded-lg text-success text-sm"
                         >
                         </div>
 
-                        <button type="submit" class="button primary full-width">
+                        <button
+                            type="submit"
+                            class="w-full flex items-center justify-center px-6 py-3 bg-accent text-dark-bg font-semibold rounded-lg hover:bg-accent/90 transition-colors"
+                        >
                             <span id="sendButtonText">Send Receipt</span>
                             <span
                                 id="sendSpinner"
-                                class="spinner"
-                                style="display: none;"></span>
+                                class="hidden inline-block w-4 h-4 border-2 border-dark-bg border-t-transparent rounded-full animate-spin ml-2"
+                            ></span>
                         </button>
                     </form>
                 </div>
 
                 <!-- Request History Section -->
-                <div class="dashboard-section card">
-                    <h2>Request History</h2>
-                    <div id="logsTable" class="logs-table">
-                        <p class="loading">Loading request history...</p>
+                <div
+                    class="p-6 bg-dark-bg-tertiary rounded-lg border border-dark-border-light"
+                >
+                    <h2 class="text-2xl font-bold mb-0">Request History</h2>
+                    <div id="logsTable" class="flex flex-col gap-4 mt-6">
+                        <p class="text-center text-text-tertiary py-8">
+                            Loading request history...
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </Layout>
-
-<style>
-    .dashboard {
-        padding: var(--space-12) 0;
-        min-height: calc(100vh - 8rem);
-    }
-
-    .dashboard-header {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        margin-bottom: var(--space-8);
-        flex-wrap: wrap;
-        gap: var(--space-4);
-    }
-
-    .dashboard-header h1 {
-        margin-bottom: var(--space-2);
-    }
-
-    .dashboard-header p {
-        color: var(--color-text-tertiary);
-        margin: 0;
-    }
-
-    .dashboard-grid {
-        display: grid;
-        gap: var(--space-8);
-    }
-
-    .dashboard-section {
-        padding: var(--space-6);
-    }
-
-    .section-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: var(--space-6);
-        flex-wrap: wrap;
-        gap: var(--space-4);
-    }
-
-    .section-header h2 {
-        margin: 0;
-    }
-
-    .api-keys-list,
-    .logs-table {
-        display: flex;
-        flex-direction: column;
-        gap: var(--space-4);
-    }
-
-    .api-key-item {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: var(--space-4);
-        background-color: var(--color-bg-tertiary);
-        border: 1px solid var(--color-border-light);
-        border-radius: var(--radius-md);
-        gap: var(--space-4);
-        flex-wrap: wrap;
-    }
-
-    .api-key-value {
-        font-family: var(--font-mono);
-        font-size: 0.9375rem;
-        color: var(--color-accent);
-        flex: 1;
-        word-break: break-all;
-    }
-
-    .api-key-actions {
-        display: flex;
-        gap: var(--space-3);
-    }
-
-    .api-key-actions button {
-        padding: var(--space-2) var(--space-4);
-        font-size: 0.875rem;
-    }
-
-    .log-item {
-        display: grid;
-        grid-template-columns: auto 1fr auto auto;
-        gap: var(--space-4);
-        padding: var(--space-3);
-        background-color: var(--color-bg-tertiary);
-        border: 1px solid var(--color-border-light);
-        border-radius: var(--radius-md);
-        font-size: 0.875rem;
-        align-items: center;
-    }
-
-    .log-status {
-        padding: var(--space-1) var(--space-3);
-        border-radius: var(--radius-full);
-        font-size: 0.75rem;
-        font-weight: 600;
-        text-transform: uppercase;
-    }
-
-    .log-status.success {
-        background-color: rgba(0, 255, 136, 0.1);
-        color: var(--color-success);
-    }
-
-    .log-status.error {
-        background-color: rgba(255, 71, 87, 0.1);
-        color: var(--color-error);
-    }
-
-    .loading {
-        text-align: center;
-        color: var(--color-text-tertiary);
-        padding: var(--space-8);
-    }
-
-    .receipt-form {
-        display: flex;
-        flex-direction: column;
-        gap: var(--space-4);
-    }
-
-    .form-group {
-        display: flex;
-        flex-direction: column;
-        gap: var(--space-2);
-    }
-
-    .form-group label {
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: var(--color-text-primary);
-    }
-
-    .success-message {
-        padding: var(--space-3);
-        background-color: rgba(0, 255, 136, 0.1);
-        border: 1px solid var(--color-success);
-        border-radius: var(--radius-md);
-        color: var(--color-success);
-        font-size: 0.875rem;
-    }
-
-    @media (max-width: 768px) {
-        .log-item {
-            grid-template-columns: 1fr;
-            gap: var(--space-2);
-        }
-    }
-</style>
 
 <script>
     const apiUrl = import.meta.env.PUBLIC_API_URL || "http://localhost:3000";
@@ -294,7 +173,7 @@ import Layout from "../layouts/Layout.astro";
 
             if (data.data.length === 0) {
                 container.innerHTML =
-                    '<p class="loading">No API keys yet. Generate your first one!</p>';
+                    '<p class="text-center text-text-tertiary py-8">No API keys yet. Generate your first one!</p>';
                 currentApiKey = null;
                 return;
             }
@@ -306,11 +185,11 @@ import Layout from "../layouts/Layout.astro";
             container.innerHTML = data.data
                 .map(
                     (key: any) => `
-        <div class="api-key-item">
-          <code class="api-key-value">${key.key}</code>
-          <div class="api-key-actions">
-            <button class="button secondary copy-key" data-key="${key.key}">Copy</button>
-            ${key.isActive ? `<button class="button secondary revoke-key" data-id="${key.id}">Revoke</button>` : '<span style="color: var(--color-text-tertiary);">Revoked</span>'}
+        <div class="flex items-center justify-between p-4 bg-dark-bg border border-dark-border-light rounded-lg gap-4 flex-wrap">
+          <code class="font-mono text-[15px] text-accent flex-1 break-all">${key.key}</code>
+          <div class="flex gap-3">
+            <button class="copy-key px-4 py-2 text-sm bg-dark-bg-tertiary border border-dark-border-light text-text-primary font-semibold rounded-lg hover:border-accent transition-colors" data-key="${key.key}">Copy</button>
+            ${key.isActive ? `<button class="revoke-key px-4 py-2 text-sm bg-dark-bg-tertiary border border-dark-border-light text-text-primary font-semibold rounded-lg hover:border-accent transition-colors" data-id="${key.id}">Revoke</button>` : '<span class="text-text-tertiary">Revoked</span>'}
           </div>
         </div>
       `,
@@ -350,7 +229,7 @@ import Layout from "../layouts/Layout.astro";
             });
         } catch (error) {
             document.getElementById("apiKeysList")!.innerHTML =
-                '<p class="loading" style="color: var(--color-error);">Failed to load API keys</p>';
+                '<p class="text-center text-error py-8">Failed to load API keys</p>';
         }
     }
 
@@ -381,25 +260,25 @@ import Layout from "../layouts/Layout.astro";
 
             if (data.data.length === 0) {
                 container.innerHTML =
-                    '<p class="loading">No request history yet.</p>';
+                    '<p class="text-center text-text-tertiary py-8">No request history yet.</p>';
                 return;
             }
 
             container.innerHTML = data.data
                 .map(
                     (log: any) => `
-        <div class="log-item">
-          <span class="log-status ${log.status}">${log.status}</span>
-          <code>${log.endpoint}</code>
-          <span style="color: var(--color-text-tertiary); font-size: 0.8125rem;">${new Date(log.timestamp).toLocaleString()}</span>
-          <code style="color: var(--color-text-tertiary);">${log.apiKey}</code>
+        <div class="grid grid-cols-1 md:grid-cols-[auto_1fr_auto_auto] gap-4 p-3 bg-dark-bg border border-dark-border-light rounded-lg text-sm items-center">
+          <span class="px-3 py-1 rounded-full text-xs font-semibold uppercase ${log.status === "success" ? "bg-success/10 text-success" : "bg-error/10 text-error"}">${log.status}</span>
+          <code class="font-mono">${log.endpoint}</code>
+          <span class="text-text-tertiary text-[13px]">${new Date(log.timestamp).toLocaleString()}</span>
+          <code class="text-text-tertiary font-mono">${log.apiKey}</code>
         </div>
       `,
                 )
                 .join("");
         } catch (error) {
             document.getElementById("logsTable")!.innerHTML =
-                '<p class="loading" style="color: var(--color-error);">Failed to load logs</p>';
+                '<p class="text-center text-error py-8">Failed to load logs</p>';
         }
     }
 
@@ -416,13 +295,13 @@ import Layout from "../layouts/Layout.astro";
             const buttonText = document.getElementById("sendButtonText")!;
             const spinner = document.getElementById("sendSpinner")!;
 
-            errorDiv.style.display = "none";
-            successDiv.style.display = "none";
+            errorDiv.classList.add("hidden");
+            successDiv.classList.add("hidden");
 
             // Get first active API key
             if (!currentApiKey) {
                 errorDiv.textContent = "Please generate an API key first";
-                errorDiv.style.display = "block";
+                errorDiv.classList.remove("hidden");
                 return;
             }
 
@@ -435,7 +314,7 @@ import Layout from "../layouts/Layout.astro";
 
             // Show loading
             buttonText.style.display = "none";
-            spinner.style.display = "inline-block";
+            spinner.classList.remove("hidden");
 
             try {
                 const response = await fetch(`${apiUrl}/api/send-receipt`, {
@@ -454,7 +333,7 @@ import Layout from "../layouts/Layout.astro";
                 }
 
                 successDiv.textContent = `Receipt sent successfully to ${data.email}!`;
-                successDiv.style.display = "block";
+                successDiv.classList.remove("hidden");
 
                 // Reset form
                 (e.target as HTMLFormElement).reset();
@@ -463,10 +342,10 @@ import Layout from "../layouts/Layout.astro";
                 setTimeout(() => loadLogs(), 1000);
             } catch (error: any) {
                 errorDiv.textContent = error.message;
-                errorDiv.style.display = "block";
+                errorDiv.classList.remove("hidden");
             } finally {
                 buttonText.style.display = "inline";
-                spinner.style.display = "none";
+                spinner.classList.add("hidden");
             }
         });
 
