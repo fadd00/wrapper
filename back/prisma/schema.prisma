@@ -7,14 +7,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  ADMIN
+  USER
+}
+
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
   password  String
+  role      Role     @default(USER)
   createdAt DateTime @default(now()) @map("created_at")
-  
-  apiKeys   ApiKey[]
-  
+
+  apiKeys ApiKey[]
+
   @@map("users")
 }
 
@@ -24,10 +30,10 @@ model ApiKey {
   keyString String   @unique @map("key_string")
   isActive  Boolean  @default(true) @map("is_active")
   createdAt DateTime @default(now()) @map("created_at")
-  
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  logs      Log[]
-  
+
+  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  logs Log[]
+
   @@index([userId])
   @@map("api_keys")
 }
@@ -40,9 +46,9 @@ model Log {
   requestData  Json?    @map("request_data")
   responseData Json?    @map("response_data")
   timestamp    DateTime @default(now())
-  
-  apiKey       ApiKey   @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
-  
+
+  apiKey ApiKey @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
+
   @@index([apiKeyId])
   @@index([timestamp(sort: Desc)])
   @@map("logs")

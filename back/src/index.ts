@@ -5,7 +5,9 @@ import { cors } from '@elysiajs/cors';
 import { env } from './config/env';
 import { testConnection } from './config/database';
 import { authRoutes } from './routes/auth';
-import { apiKeyRoutes } from './routes/apiKeys';
+import { adminApiKeyRoutes } from './routes/adminApiKeys';
+import { userApiKeyRoutes } from './routes/userApiKeys';
+import { adminUserRoutes } from './routes/adminUsers';
 import { emailRoutes } from './routes/email';
 import { logsRoutes } from './routes/logs';
 
@@ -36,7 +38,9 @@ const app = new Elysia()
       },
       tags: [
         { name: 'Auth', description: 'Authentication endpoints' },
-        { name: 'API Keys', description: 'API key management' },
+        { name: 'Admin - API Keys', description: 'Admin API key management (CRUD all keys)' },
+        { name: 'Admin - Users', description: 'Admin user management' },
+        { name: 'User - API Keys', description: 'User API key access (read-only)' },
         { name: 'Email', description: 'Email sending endpoints' },
         { name: 'Logs', description: 'Request logs' }
       ],
@@ -69,7 +73,9 @@ const app = new Elysia()
 
   // Register routes
   .use(authRoutes)
-  .use(apiKeyRoutes)
+  .use(adminApiKeyRoutes)
+  .use(adminUserRoutes)
+  .use(userApiKeyRoutes)
   .use(emailRoutes)
   .use(logsRoutes)
 

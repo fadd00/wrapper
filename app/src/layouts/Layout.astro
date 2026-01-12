@@ -2,11 +2,13 @@
 interface Props {
   title: string;
   description?: string;
+  showNav?: boolean;
 }
 
 const {
   title,
   description = "Email Receipt API Wrapper - Send beautiful receipt emails via Resend",
+  showNav = false,
 } = Astro.props;
 const apiUrl = import.meta.env.PUBLIC_API_URL || "http://localhost:3000";
 ---
@@ -21,20 +23,23 @@ const apiUrl = import.meta.env.PUBLIC_API_URL || "http://localhost:3000";
     <link rel="stylesheet" href="/src/styles/global.css" />
   </head>
   <body>
-    <nav class="nav">
-      <div class="container">
-        <div class="nav-content">
-          <a href="/" class="logo">
-            <span class="gradient-text">Wrapper</span>
-          </a>
-          <div class="nav-links">
-            <a href="/docs">Docs</a>
-            <a href="/dashboard">Dashboard</a>
-            <a href="/login" class="button primary">Get Started</a>
+    {
+      showNav && (
+        <nav class="nav">
+          <div class="container">
+            <div class="nav-content">
+              <a href="/" class="logo">
+                <span class="gradient-text">Wrapper</span>
+              </a>
+              <div class="nav-links">
+                <a href="/docs">Docs</a>
+                <a href="/dashboard">Dashboard</a>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-    </nav>
+        </nav>
+      )
+    }
 
     <main>
       <slot />

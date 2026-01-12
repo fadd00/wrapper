@@ -1,14 +1,25 @@
 ---
 import Layout from "../layouts/Layout.astro";
+
+const apiUrl = import.meta.env.PUBLIC_API_URL || "http://localhost:3000";
 ---
 
-<Layout title="Dashboard - Wrapper API">
+<Layout title="Dashboard - Wrapper API" showNav={true}>
     <div class="py-12 min-h-[calc(100vh-8rem)]">
         <div class="container">
             <div class="flex items-start justify-between mb-8 flex-wrap gap-4">
                 <div>
                     <h1 class="text-4xl font-bold mb-2">Dashboard</h1>
-                    <p id="userEmail" class="text-text-tertiary">Loading...</p>
+                    <p
+                        id="userEmail"
+                        class="text-text-tertiary flex items-center gap-2"
+                    >
+                        <span>Loading...</span>
+                        <span
+                            id="userRole"
+                            class="text-xs px-2 py-1 rounded bg-accent/20 text-accent font-semibold"
+                        ></span>
+                    </p>
                 </div>
                 <button
                     id="logoutBtn"
@@ -17,125 +28,127 @@ import Layout from "../layouts/Layout.astro";
                 >
             </div>
 
-            <div class="grid gap-8">
-                <!-- API Keys Section -->
+            <!-- Admin Dashboard -->
+            <div id="adminDashboard" class="hidden grid gap-8">
+                <!-- All API Keys Section (Admin) -->
                 <div
                     class="p-6 bg-dark-bg-tertiary rounded-lg border border-dark-border-light"
                 >
                     <div
                         class="flex items-center justify-between mb-6 flex-wrap gap-4"
                     >
-                        <h2 class="text-2xl font-bold m-0">API Keys</h2>
+                        <h2 class="text-2xl font-bold m-0">All API Keys</h2>
                         <button
-                            id="generateKeyBtn"
+                            id="createKeyBtn"
                             class="px-6 py-2.5 bg-accent text-dark-bg font-semibold rounded-lg hover:bg-accent/90 transition-colors"
+                            >+ Create API Key</button
                         >
-                            <span>+ Generate New Key</span>
-                        </button>
                     </div>
 
-                    <div id="apiKeysList" class="flex flex-col gap-4">
+                    <div id="adminApiKeysList" class="flex flex-col gap-4">
+                        <p class="text-center text-text-tertiary py-8">
+                            Loading API keys...
+                        </p>
+                    </div>
+                </div>
+
+                <!-- All Users Section (Admin) -->
+                <div
+                    class="p-6 bg-dark-bg-tertiary rounded-lg border border-dark-border-light"
+                >
+                    <h2 class="text-2xl font-bold mb-6">All Users</h2>
+                    <div id="usersList" class="flex flex-col gap-4">
+                        <p class="text-center text-text-tertiary py-8">
+                            Loading users...
+                        </p>
+                    </div>
+                </div>
+
+                <!-- All Logs Section (Admin) -->
+                <div
+                    class="p-6 bg-dark-bg-tertiary rounded-lg border border-dark-border-light"
+                >
+                    <h2 class="text-2xl font-bold mb-0">All Request Logs</h2>
+                    <div id="adminLogsTable" class="flex flex-col gap-4 mt-6">
+                        <p class="text-center text-text-tertiary py-8">
+                            Loading logs...
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Dashboard -->
+            <div id="userDashboard" class="hidden grid gap-8">
+                <!-- My API Keys Section (User - Read only) -->
+                <div
+                    class="p-6 bg-dark-bg-tertiary rounded-lg border border-dark-border-light"
+                >
+                    <h2 class="text-2xl font-bold mb-4">My API Keys</h2>
+                    <p class="text-text-tertiary mb-6 text-sm">
+                        API keys assigned by admin. You can copy and use these
+                        keys.
+                    </p>
+
+                    <div id="userApiKeysList" class="flex flex-col gap-4">
                         <p class="text-center text-text-tertiary py-8">
                             Loading your API keys...
                         </p>
                     </div>
                 </div>
 
-                <!-- Send Test Receipt Section -->
+                <!-- My Request History (User) -->
                 <div
                     class="p-6 bg-dark-bg-tertiary rounded-lg border border-dark-border-light"
                 >
-                    <h2 class="text-2xl font-bold mb-2">Send Test Receipt</h2>
-                    <p class="text-text-tertiary mb-4">
-                        Test your API by sending a receipt email
-                    </p>
-
-                    <form id="sendReceiptForm" class="flex flex-col gap-4">
-                        <div class="flex flex-col gap-2">
-                            <label
-                                for="item"
-                                class="text-sm font-semibold text-text-primary"
-                                >Item Name</label
-                            >
-                            <input
-                                type="text"
-                                id="item"
-                                name="item"
-                                placeholder="e.g., Laptop"
-                                required
-                                class="px-4 py-2.5 bg-dark-bg-secondary border border-dark-border rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-accent transition-colors"
-                            />
-                        </div>
-
-                        <div class="flex flex-col gap-2">
-                            <label
-                                for="harga"
-                                class="text-sm font-semibold text-text-primary"
-                                >Price (numbers only)</label
-                            >
-                            <input
-                                type="text"
-                                id="harga"
-                                name="harga"
-                                placeholder="e.g., 5000000"
-                                pattern="[0-9]+"
-                                required
-                                class="px-4 py-2.5 bg-dark-bg-secondary border border-dark-border rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-accent transition-colors"
-                            />
-                        </div>
-
-                        <div class="flex flex-col gap-2">
-                            <label
-                                for="email"
-                                class="text-sm font-semibold text-text-primary"
-                                >Recipient Email</label
-                            >
-                            <input
-                                type="email"
-                                id="email"
-                                name="email"
-                                placeholder="customer@example.com"
-                                required
-                                class="px-4 py-2.5 bg-dark-bg-secondary border border-dark-border rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-accent transition-colors"
-                            />
-                        </div>
-
-                        <div
-                            id="receiptError"
-                            class="hidden p-3 bg-error/10 border border-error rounded-lg text-error text-sm"
-                        >
-                        </div>
-                        <div
-                            id="receiptSuccess"
-                            class="hidden p-3 bg-success/10 border border-success rounded-lg text-success text-sm"
-                        >
-                        </div>
-
-                        <button
-                            type="submit"
-                            class="w-full flex items-center justify-center px-6 py-3 bg-accent text-dark-bg font-semibold rounded-lg hover:bg-accent/90 transition-colors"
-                        >
-                            <span id="sendButtonText">Send Receipt</span>
-                            <span
-                                id="sendSpinner"
-                                class="hidden inline-block w-4 h-4 border-2 border-dark-bg border-t-transparent rounded-full animate-spin ml-2"
-                            ></span>
-                        </button>
-                    </form>
-                </div>
-
-                <!-- Request History Section -->
-                <div
-                    class="p-6 bg-dark-bg-tertiary rounded-lg border border-dark-border-light"
-                >
-                    <h2 class="text-2xl font-bold mb-0">Request History</h2>
-                    <div id="logsTable" class="flex flex-col gap-4 mt-6">
+                    <h2 class="text-2xl font-bold mb-0">My Request History</h2>
+                    <div id="userLogsTable" class="flex flex-col gap-4 mt-6">
                         <p class="text-center text-text-tertiary py-8">
                             Loading request history...
                         </p>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Create API Key Modal (Admin) -->
+    <div
+        id="createKeyModal"
+        class="hidden fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
+    >
+        <div
+            class="bg-dark-bg-tertiary border border-dark-border-light rounded-lg p-6 max-w-md w-full"
+        >
+            <h3 class="text-xl font-bold mb-4">Create API Key for User</h3>
+
+            <form id="createKeyForm" class="flex flex-col gap-4">
+                <div class="flex flex-col gap-2">
+                    <label for="selectUser" class="text-sm font-semibold"
+                        >Select User</label
+                    >
+                    <select
+                        id="selectUser"
+                        required
+                        class="px-4 py-2.5 bg-dark-bg-secondary border border-dark-border rounded-lg text-text-primary focus:outline-none focus:border-accent transition-colors"
+                    >
+                        <option value="">Loading users...</option>
+                    </select>
+                </div>
+
+                <div class="flex gap-3 justify-end">
+                    <button
+                        type="button"
+                        id="cancelCreateBtn"
+                        class="px-6 py-2.5 bg-dark-bg-secondary border border-dark-border text-text-primary font-semibold rounded-lg hover:border-accent transition-colors"
+                        >Cancel</button
+                    >
+                    <button
+                        type="submit"
+                        class="px-6 py-2.5 bg-accent text-dark-bg font-semibold rounded-lg hover:bg-accent/90 transition-colors"
+                        >Create</button
+                    >
+                </div>
+            </form>
         </div>
     </div>
 </Layout>
@@ -152,7 +165,19 @@ import Layout from "../layouts/Layout.astro";
     }
 
     const user = JSON.parse(userStr!);
-    document.getElementById("userEmail")!.textContent = user.email;
+    const emailEl = document.getElementById("userEmail");
+    if (emailEl) emailEl.querySelector("span")!.textContent = user.email;
+    const roleEl = document.getElementById("userRole");
+    if (roleEl) roleEl.textContent = user.role;
+
+    // Show appropriate dashboard based on role
+    if (user.role === "ADMIN") {
+        document.getElementById("adminDashboard")!.classList.remove("hidden");
+        loadAdminData();
+    } else {
+        document.getElementById("userDashboard")!.classList.remove("hidden");
+        loadUserData();
+    }
 
     // Logout
     document.getElementById("logoutBtn")!.addEventListener("click", () => {
@@ -161,38 +186,243 @@ import Layout from "../layouts/Layout.astro";
         window.location.href = "/";
     });
 
-    // Load API keys
-    async function loadApiKeys() {
+    // ===== ADMIN FUNCTIONS =====
+    async function loadAdminData() {
+        await loadAllApiKeys();
+        await loadAllUsers();
+        await loadAdminLogs();
+    }
+
+    async function loadAllApiKeys() {
         try {
-            const response = await fetch(`${apiUrl}/api-keys/list`, {
+            const response = await fetch(`${apiUrl}/admin/keys`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             const data = await response.json();
 
-            const container = document.getElementById("apiKeysList")!;
+            const container = document.getElementById("adminApiKeysList")!;
 
             if (data.data.length === 0) {
                 container.innerHTML =
-                    '<p class="text-center text-text-tertiary py-8">No API keys yet. Generate your first one!</p>';
-                currentApiKey = null;
+                    '<p class="text-center text-text-tertiary py-8">No API keys created yet.</p>';
                 return;
             }
-
-            // Store first active key for send receipt form
-            const activeKey = data.data.find((k: any) => k.isActive);
-            currentApiKey = activeKey ? activeKey.key : null;
 
             container.innerHTML = data.data
                 .map(
                     (key: any) => `
-        <div class="flex items-center justify-between p-4 bg-dark-bg border border-dark-border-light rounded-lg gap-4 flex-wrap">
-          <code class="font-mono text-[15px] text-accent flex-1 break-all">${key.key}</code>
-          <div class="flex gap-3">
-            <button class="copy-key px-4 py-2 text-sm bg-dark-bg-tertiary border border-dark-border-light text-text-primary font-semibold rounded-lg hover:border-accent transition-colors" data-key="${key.key}">Copy</button>
-            ${key.isActive ? `<button class="revoke-key px-4 py-2 text-sm bg-dark-bg-tertiary border border-dark-border-light text-text-primary font-semibold rounded-lg hover:border-accent transition-colors" data-id="${key.id}">Revoke</button>` : '<span class="text-text-tertiary">Revoked</span>'}
-          </div>
-        </div>
-      `,
+                    <div class="flex items-center justify-between p-4 bg-dark-bg border border-dark-border-light rounded-lg gap-4 flex-wrap">
+                        <div class="flex-1 min-w-0">
+                            <code class="font-mono text-[15px] text-accent block break-all">${key.key}</code>
+                            <span class="text-text-tertiary text-sm">User: ${key.user.email}</span>
+                        </div>
+                        <div class="flex gap-3">
+                            <button class="toggle-key px-4 py-2 text-sm ${key.isActive ? "bg-success/10 text-success" : "bg-error/10 text-error"} border ${key.isActive ? "border-success" : "border-error"} font-semibold rounded-lg hover:opacity-80 transition-opacity" data-id="${key.id}" data-active="${key.isActive}">
+                                ${key.isActive ? "Active" : "Inactive"}
+                            </button>
+                            <button class="delete-key px-4 py-2 text-sm bg-error/10 text-error border border-error font-semibold rounded-lg hover:opacity-80 transition-opacity" data-id="${key.id}">Delete</button>
+                        </div>
+                    </div>
+                `,
+                )
+                .join("");
+
+            // Toggle buttons
+            document.querySelectorAll(".toggle-key").forEach((btn) => {
+                btn.addEventListener("click", async (e) => {
+                    const id = (e.target as HTMLElement).getAttribute(
+                        "data-id",
+                    )!;
+                    await fetch(`${apiUrl}/admin/keys/${id}/toggle`, {
+                        method: "PATCH",
+                        headers: { Authorization: `Bearer ${token}` },
+                    });
+                    loadAllApiKeys();
+                });
+            });
+
+            // Delete buttons
+            document.querySelectorAll(".delete-key").forEach((btn) => {
+                btn.addEventListener("click", async (e) => {
+                    const id = (e.target as HTMLElement).getAttribute(
+                        "data-id",
+                    )!;
+                    if (
+                        confirm("Are you sure you want to delete this API key?")
+                    ) {
+                        await fetch(`${apiUrl}/admin/keys/${id}`, {
+                            method: "DELETE",
+                            headers: { Authorization: `Bearer ${token}` },
+                        });
+                        loadAllApiKeys();
+                    }
+                });
+            });
+        } catch (error) {
+            document.getElementById("adminApiKeysList")!.innerHTML =
+                '<p class="text-center text-error py-8">Failed to load API keys</p>';
+        }
+    }
+
+    async function loadAllUsers() {
+        try {
+            const response = await fetch(`${apiUrl}/admin/users`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            const data = await response.json();
+
+            const container = document.getElementById("usersList")!;
+            const selectUser = document.getElementById(
+                "selectUser",
+            ) as HTMLSelectElement;
+
+            if (data.data.length === 0) {
+                container.innerHTML =
+                    '<p class="text-center text-text-tertiary py-8">No users yet.</p>';
+                return;
+            }
+
+            // Populate users list
+            container.innerHTML = data.data
+                .map(
+                    (u: any) => `
+                    <div  class="flex items-center justify-between p-4 bg-dark-bg border border-dark-border-light rounded-lg">
+                        <div>
+                            <div class="font-semibold">${u.email}</div>
+                            <div class="text-sm text-text-tertiary">API Keys: ${u.apiKeyCount}</div>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-xs font-semibold ${u.role === "ADMIN" ? "bg-accent/20 text-accent" : "bg-dark-bg-secondary text-text-tertiary"}">${u.role}</span>
+                    </div>
+                `,
+                )
+                .join("");
+
+            // Populate dropdown for create key modal
+            selectUser.innerHTML =
+                '<option value="">Select a user...</option>' +
+                data.data
+                    .map(
+                        (u: any) =>
+                            `<option value="${u.id}">${u.email} (${u.role})</option>`,
+                    )
+                    .join("");
+        } catch (error) {
+            document.getElementById("usersList")!.innerHTML =
+                '<p class="text-center text-error py-8">Failed to load users</p>';
+        }
+    }
+
+    async function loadAdminLogs() {
+        try {
+            const response = await fetch(`${apiUrl}/logs`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            const data = await response.json();
+
+            const container = document.getElementById("adminLogsTable")!;
+
+            if (data.data.length === 0) {
+                container.innerHTML =
+                    '<p class="text-center text-text-tertiary py-8">No logs yet.</p>';
+                return;
+            }
+
+            container.innerHTML = data.data
+                .map(
+                    (log: any) => `
+                    <div class="grid grid-cols-1 md:grid-cols-[auto_1fr_auto_auto_auto] gap-4 p-3 bg-dark-bg border border-dark-border-light rounded-lg text-sm items-center">
+                        <span class="px-3 py-1 rounded-full text-xs font-semibold uppercase ${log.status === "success" ? "bg-success/10 text-success" : "bg-error/10 text-error"}">${log.status}</span>
+                        <code class="font-mono">${log.endpoint}</code>
+                        <span class="text-text-tertiary text-[13px]">${new Date(log.timestamp).toLocaleString()}</span>
+                        <code class="text-text-tertiary font-mono">${log.apiKey}</code>
+                        ${log.userEmail ? `<span class="text-text-tertiary text-xs">${log.userEmail}</span>` : ""}
+                    </div>
+                `,
+                )
+                .join("");
+        } catch (error) {
+            document.getElementById("adminLogsTable")!.innerHTML =
+                '<p class="text-center text-error py-8">Failed to load logs</p>';
+        }
+    }
+
+    // Create key modal
+    document.getElementById("createKeyBtn")!.addEventListener("click", () => {
+        document.getElementById("createKeyModal")!.classList.remove("hidden");
+    });
+
+    document
+        .getElementById("cancelCreateBtn")!
+        .addEventListener("click", () => {
+            document.getElementById("createKeyModal")!.classList.add("hidden");
+        });
+
+    document
+        .getElementById("createKeyForm")!
+        .addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const userId = parseInt(
+                (document.getElementById("selectUser") as HTMLSelectElement)
+                    .value,
+            );
+
+            if (!userId) return;
+
+            try {
+                await fetch(`${apiUrl}/admin/keys`, {
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ userId }),
+                });
+
+                document
+                    .getElementById("createKeyModal")!
+                    .classList.add("hidden");
+                (e.target as HTMLFormElement).reset();
+                loadAllApiKeys();
+            } catch (error) {
+                alert("Failed to create API key");
+            }
+        });
+
+    // ===== USER FUNCTIONS =====
+    async function loadUserData() {
+        await loadUserApiKeys();
+        await loadUserLogs();
+    }
+
+    let currentApiKey: string | null = null;
+
+    async function loadUserApiKeys() {
+        try {
+            const response = await fetch(`${apiUrl}/keys`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            const data = await response.json();
+
+            const container = document.getElementById("userApiKeysList")!;
+
+            if (data.data.length === 0) {
+                container.innerHTML =
+                    '<p class="text-center text-text-tertiary py-8">No API keys assigned yet. Please contact admin.</p>';
+                currentApiKey = null;
+                return;
+            }
+
+            // Store first key for send receipt form
+            currentApiKey = data.data[0].key;
+
+            container.innerHTML = data.data
+                .map(
+                    (key: any) => `
+                    <div class="flex items-center justify-between p-4 bg-dark-bg border border-dark-border-light rounded-lg gap-4 flex-wrap">
+                        <code class="font-mono text-[15px] text-accent flex-1 break-all">${key.key}</code>
+                        <button class="copy-key px-4 py-2 text-sm bg-dark-bg-tertiary border border-dark-border-light text-text-primary font-semibold rounded-lg hover:border-accent transition-colors" data-key="${key.key}">Copy</button>
+                    </div>
+                `,
                 )
                 .join("");
 
@@ -209,54 +439,20 @@ import Layout from "../layouts/Layout.astro";
                     }, 2000);
                 });
             });
-
-            // Revoke buttons
-            document.querySelectorAll(".revoke-key").forEach((btn) => {
-                btn.addEventListener("click", async (e) => {
-                    const id = (e.target as HTMLElement).getAttribute(
-                        "data-id",
-                    )!;
-                    if (
-                        confirm("Are you sure you want to revoke this API key?")
-                    ) {
-                        await fetch(`${apiUrl}/api-keys/revoke/${id}`, {
-                            method: "PATCH",
-                            headers: { Authorization: `Bearer ${token}` },
-                        });
-                        loadApiKeys();
-                    }
-                });
-            });
         } catch (error) {
-            document.getElementById("apiKeysList")!.innerHTML =
+            document.getElementById("userApiKeysList")!.innerHTML =
                 '<p class="text-center text-error py-8">Failed to load API keys</p>';
         }
     }
 
-    // Generate new key
-    document
-        .getElementById("generateKeyBtn")!
-        .addEventListener("click", async () => {
-            try {
-                await fetch(`${apiUrl}/api-keys/generate`, {
-                    method: "POST",
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-                loadApiKeys();
-            } catch (error) {
-                alert("Failed to generate API key");
-            }
-        });
-
-    // Load logs
-    async function loadLogs() {
+    async function loadUserLogs() {
         try {
             const response = await fetch(`${apiUrl}/logs`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             const data = await response.json();
 
-            const container = document.getElementById("logsTable")!;
+            const container = document.getElementById("userLogsTable")!;
 
             if (data.data.length === 0) {
                 container.innerHTML =
@@ -267,27 +463,25 @@ import Layout from "../layouts/Layout.astro";
             container.innerHTML = data.data
                 .map(
                     (log: any) => `
-        <div class="grid grid-cols-1 md:grid-cols-[auto_1fr_auto_auto] gap-4 p-3 bg-dark-bg border border-dark-border-light rounded-lg text-sm items-center">
-          <span class="px-3 py-1 rounded-full text-xs font-semibold uppercase ${log.status === "success" ? "bg-success/10 text-success" : "bg-error/10 text-error"}">${log.status}</span>
-          <code class="font-mono">${log.endpoint}</code>
-          <span class="text-text-tertiary text-[13px]">${new Date(log.timestamp).toLocaleString()}</span>
-          <code class="text-text-tertiary font-mono">${log.apiKey}</code>
-        </div>
-      `,
+                    <div class="grid grid-cols-1 md:grid-cols-[auto_1fr_auto_auto] gap-4 p-3 bg-dark-bg border border-dark-border-light rounded-lg text-sm items-center">
+                        <span class="px-3 py-1 rounded-full text-xs font-semibold uppercase ${log.status === "success" ? "bg-success/10 text-success" : "bg-error/10 text-error"}">${log.status}</span>
+                        <code class="font-mono">${log.endpoint}</code>
+                        <span class="text-text-tertiary text-[13px]">${new Date(log.timestamp).toLocaleString()}</span>
+                        <code class="text-text-tertiary font-mono">${log.apiKey}</code>
+                    </div>
+                `,
                 )
                 .join("");
         } catch (error) {
-            document.getElementById("logsTable")!.innerHTML =
+            document.getElementById("userLogsTable")!.innerHTML =
                 '<p class="text-center text-error py-8">Failed to load logs</p>';
         }
     }
 
-    // Send receipt handler
-    let currentApiKey: string | null = null;
-
-    document
-        .getElementById("sendReceiptForm")!
-        .addEventListener("submit", async (e) => {
+    // Send receipt (User only)
+    const sendForm = document.getElementById("sendReceiptForm");
+    if (sendForm) {
+        sendForm.addEventListener("submit", async (e) => {
             e.preventDefault();
 
             const errorDiv = document.getElementById("receiptError")!;
@@ -298,9 +492,9 @@ import Layout from "../layouts/Layout.astro";
             errorDiv.classList.add("hidden");
             successDiv.classList.add("hidden");
 
-            // Get first active API key
             if (!currentApiKey) {
-                errorDiv.textContent = "Please generate an API key first";
+                errorDiv.textContent =
+                    "No API key available. Please contact admin.";
                 errorDiv.classList.remove("hidden");
                 return;
             }
@@ -338,8 +532,8 @@ import Layout from "../layouts/Layout.astro";
                 // Reset form
                 (e.target as HTMLFormElement).reset();
 
-                // Reload logs to show new entry
-                setTimeout(() => loadLogs(), 1000);
+                // Reload logs
+                setTimeout(() => loadUserLogs(), 1000);
             } catch (error: any) {
                 errorDiv.textContent = error.message;
                 errorDiv.classList.remove("hidden");
@@ -348,8 +542,5 @@ import Layout from "../layouts/Layout.astro";
                 spinner.classList.add("hidden");
             }
         });
-
-    // Initial load
-    loadApiKeys();
-    loadLogs();
+    }
 </script>

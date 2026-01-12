@@ -17,7 +17,7 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
     }))
     .post('/register', async ({ body, jwt, set }) => {
         try {
-            const { email, password } = body;
+            const { email, password, role } = body;
 
             // Check if user already exists
             const existingUser = await prisma.user.findUnique({
@@ -33,6 +33,8 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
                 };
             }
 
+            // Use role from request body
+
             // Hash password
             const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -40,19 +42,22 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
             const user = await prisma.user.create({
                 data: {
                     email,
-                    password: hashedPassword
+                    password: hashedPassword,
+                    role
                 },
                 select: {
                     id: true,
                     email: true,
+                    role: true,
                     createdAt: true
                 }
             });
 
-            // Generate JWT token
+            // Generate JWT token with role
             const token = await jwt.sign({
                 userId: user.id,
-                email: user.email
+                email: user.email,
+                role: user.role
             });
 
             return {
@@ -62,6 +67,7 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
                     user: {
                         id: user.id,
                         email: user.email,
+                        role: user.role,
                         createdAt: user.createdAt
                     },
                     token
@@ -78,7 +84,8 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
     }, {
         body: t.Object({
             email: t.String({ format: 'email' }),
-            password: t.String({ minLength: 6 })
+            password: t.String({ minLength: 6 }),
+            role: t.Enum({ ADMIN: 'ADMIN', USER: 'USER' })
         })
     })
 
@@ -86,9 +93,16 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
         try {
             const { email, password } = body;
 
-            // Find user
+            // Find user with role
             const user = await prisma.user.findUnique({
-                where: { email }
+                where: { email },
+                select: {
+                    id: true,
+                    email: true,
+                    password: true,
+                    role: true,
+                    createdAt: true
+                }
             });
 
             if (!user) {
@@ -112,10 +126,11 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
                 };
             }
 
-            // Generate JWT token
+            // Generate JWT token with role
             const token = await jwt.sign({
                 userId: user.id,
-                email: user.email
+                email: user.email,
+                role: user.role
             });
 
             return {
@@ -125,6 +140,7 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
                     user: {
                         id: user.id,
                         email: user.email,
+                        role: user.role,
                         createdAt: user.createdAt
                     },
                     token
